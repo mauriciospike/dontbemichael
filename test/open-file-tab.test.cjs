@@ -130,6 +130,12 @@ test('CSV and TSV become a table; broken quoting falls back to text (E3)', () =>
   assert.equal(CSV_ROW_LIMIT, 1000);
 });
 
+test('a CSV saved with a UTF-8 byte order mark reads like one without (E3)', () => {
+  // Value: protects=Excel CSV UTF-8 files show clean cells; fails_when=the BOM makes the first cell non empty so its quotes are kept and a quoted comma splits it; why_new=the parser only opened quotes on an empty cell; seam=none
+  assert.deepEqual(parseDelimited('\ufeff"Acme, Inc",x\r\n"Bob","2"', ','), [['Acme, Inc', 'x'], ['Bob', '2']]);
+  assert.deepEqual(parseDelimited('\ufeffa\tb', '\t'), [['a', 'b']]);
+});
+
 test('wiring: tabs after Who talks to whom, never saved, Ask me beside a file, watchers dropped on reload', () => {
   // Value: protects=the owner's tab and column behavior and the watcher cap; fails_when=the column hides on a file tab, a restart lands on a file tab, or watchers leak; why_new=all new; seam=none
   const store = read('src/renderer/src/store/store.ts');

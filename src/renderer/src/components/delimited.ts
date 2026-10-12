@@ -4,8 +4,11 @@
 export const CSV_ROW_LIMIT = 1000;
 
 /** CSV or TSV into rows, quotes and doubled quotes honored. Null when the
- *  quoting never closes: the view then shows the text as it is. */
+ *  quoting never closes: the view then shows the text as it is. A leading
+ *  UTF-8 byte order mark (Excel's CSV UTF-8) is dropped, so the first cell's
+ *  quotes are read as quotes. */
 export function parseDelimited(text: string, sep: string): string[][] | null {
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
